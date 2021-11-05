@@ -31,28 +31,32 @@
                     </a-form-item>
 
                     <a-form-item>
-                        <a-space>
-                            <a-button html-type="submit">Submit</a-button>
-                            <a-button @click="$refs.formRef.resetFields()">Reset</a-button>
-                        </a-space>
+                        <a-button type="primary" size="large" html-type="submit" long>Submit</a-button>
                     </a-form-item>
                 </a-form>
                 
             </div>
         </div>
-
-
-        <h1>登录</h1>
     </div>
 </template>
 <script>
-import { captchaApi, } from '@/api/login'
-export default {
+// eslint-disable-next-line
+import { defineComponent, ref } from 'vue'
+import { mapMutations } from 'vuex'
+import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { captchaApi, loginApi} from '@/api/login'
+
+import storage from 'store'
+
+export default defineComponent({
+    name: 'empower',
+    components: {},
+    setup() {},
     data() {
         return {
             formData: {
-                userName: '',
-                password: '',
+                userName: 'admin',
+                password: 'Xiao987321',
                 code: '',
                 key: '',
                 verifyImg: '',
@@ -63,73 +67,103 @@ export default {
         this.getVerifyCode();
     },
     methods: {
-        // 登录
-        handleSubmit({ values, errors }) {
-            if (errors) return
-            const {userName, password, code} = values;
-            console.log(userName);
-            console.log(password);
-            console.log(code);
+        // mutation方法
+        ...mapMutations(['setToken']),
 
-            
+        // 登录
+        handleSubmit({ errors }) {
+            if (errors) return
+            const {userName, password, code, key} = this.formData;
+            const params = {
+                name: userName,
+                password,
+                code,
+                key,
+            }
+
+            loginApi(params)
+            .then(res => {
+                if (res.code != 200) {
+                    this.$notification.error({
+                        title: '错误',
+                        content: res.msg
+                    })
+                    return false
+                }
+                console.log(res);
+                this.$message.success('登录成功!');
+                const token = res.token
+                console.log(token);
+
+                // 缓存token
+                this.setToken(token);
+                storage.set(ACCESS_TOKEN, token, 7 * 24 * 60 * 60 * 1000)
+                
+                // 跳转到首页
+                this.$router.push({ path: '/' })
+            })
+            .catch(err => {
+                this.$notification.error({
+                    title: '错误',
+                    content: '验证码请求出错!'
+                })
+                console.log(err)
+            })
+
         },
+
         // 获取验证码
         getVerifyCode() {
             // 清空验证码输入框
             captchaApi()
-                .then(res => {
-                    if (res.code != 200) {
-                        this.$notification.error({
-                            title: '错误',
-                            content: res.msg
-                        })
-                        return false
-                    }
-                    const data = res.data
-                    console.log(data);
-                    this.formData.verifyImg = data.img
-                    this.formData.key = data.key
-                    this.formData.code = ''
-                })
-                .catch(err => {
+            .then(res => {
+                if (res.code != 200) {
                     this.$notification.error({
                         title: '错误',
-                        content: '验证码请求出错!'
+                        content: res.msg
                     })
-                    console.log(err)
+                    return false
+                }
+                const data = res.data
+                console.log(data);
+                this.formData.verifyImg = data.img
+                this.formData.key = data.key
+                this.formData.code = ''
+            })
+            .catch(err => {
+                this.$notification.error({
+                    title: '错误',
+                    content: '验证码请求出错!'
                 })
+                console.log(err)
+            })
         },
     }
-}
-
-// import { defineComponent, ref } from "vue";
-
-// export default defineComponent({
-//     name: 'empower',
-//     components: {},
-//     setup() {
-//         const collapsed = ref(false);
-//         const onCollapse = () => {
-//             collapsed.value = !collapsed.value;
-//         };
-//         return {
-//             collapsed,
-//             onCollapse,
-//             onClickMenuItem(key) {
-//                 Message.info({ content: `You select ${key}`, showIcon: true });
-//             },
-//         };
-//     },
-// });
+});
 </script>
 <style lang="less" scoped>
     .empower {
-        width: 100%;
-        height: 100%;
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        background-color: #f2f2f2;
 
         .empower-login {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 9;
             width: 500px;
-            margin: 100px auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #fff;
+            transform: translate(-50%, -100%);
+
+            .login-title {
+                font-size: 24px;
+                color: #165DFF;
+                margin-bottom: 30px;
+            }
         }
 
  

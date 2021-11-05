@@ -1,6 +1,7 @@
 import axios from 'axios'
 // import store from '@/store'
 import storage from 'store'
+import { ACCESS_TOKEN } from '@/store/mutation-types'
 import Notification from '@arco-design/web-vue/es/notification'
 
 // 创建 axios 实例
@@ -17,7 +18,7 @@ const errorHandler = (error) => {
         console.log(error.response);
         const data = error.response.data
         // 从 localstorage 获取 token
-        // const token = storage.get('token')
+        // const token = storage.get(ACCESS_TOKEN)
 
         if (error.response.status === 404) {
             Notification.error({
@@ -53,7 +54,7 @@ const errorHandler = (error) => {
 
 // request interceptor
 request.interceptors.request.use(config => {
-    const token = storage.get('token')
+    const token = storage.get(ACCESS_TOKEN)
         // 如果 token 存在
         // 让每个请求携带自定义 token 请根据实际情况自行修改
     if (token) {

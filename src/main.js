@@ -5,6 +5,8 @@ import store from './store'
 
 import '@/assets/css/reset.css'
 
+import '@/permission'
+
 import ArcoVue from '@arco-design/web-vue';
 import ArcoVueIcon from '@arco-design/web-vue/es/icon'; // 引入图标库
 import '@arco-design/web-vue/dist/arco.css';
