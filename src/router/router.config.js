@@ -11,9 +11,10 @@ export const asyncRouterMap = [
     {
         path: '/',
         name: 'index',
-        component: BasicLayout, //navigationLayout BasicLayout
+        component: BasicLayout,
         meta: { permission: 'index'},
         redirect: '/home',
+        hidden: false,
         children: [
             // 首页
             {
@@ -52,11 +53,7 @@ export const asyncRouterMap = [
         hidden: false,
     },
 
-    {
-        path: '*',
-        redirect: '/exception',
-        hidden: true
-    }
+    
 ]
 
 // 基础路由
@@ -71,5 +68,6 @@ export const constantRouterMap = [
         path: '/exception',
         name: 'exception',
         component: () => import( /* webpackChunkName: "exception" */ '@/views/exception')
-    }
+    },
+    
 ]

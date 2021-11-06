@@ -1,8 +1,8 @@
 import { createStore } from 'vuex'
 import storage from 'store'
-import { infoApi } from '@/api/login'
+import { infoApi, logoutApi } from '@/api/login'
 import { asyncRouterMap } from '@/router/router.config'
-// import { SET_TOKEN, SET_INFO } from './mutation-types'
+import { ACCESS_TOKEN } from './mutation-types'
 
 export default createStore({
     state: {
@@ -39,24 +39,15 @@ export default createStore({
         GetInfo({ commit }) {
             return new Promise((resolve, reject) => {
                 infoApi().then(response => {
-                    console.log(response);
-
                     storage.set('userInfo', response.data);
                     commit('setInfo', response.data);
                     // 获取权限列表
                     // const { permissions } = response.data;
-                    const permissions = ['index', 'home', 'about'];
+                    const permissions = ['index', 'home', 'about', 'user'];
                     
-                    
+                    commit('setPermission', permissions); // permission.js 判断如果没有权限列表就重新请求
                     if (permissions.length) {
-                        commit('setPermission', permissions); // permission.js 判断如果没有权限列表就重新请求
-                        console.log(permissions);
-                        // 返回权限列表让 permission.js 过滤对应路由
-                        
-                        const routerList = filterAsyncRouter(asyncRouterMap, permissions)
-                        console.log(routerList);
-                        commit('setRouterList', routerList)
-                        resolve();
+                        resolve(permissions);
                     } else {
                         reject(new Error('角色必须是非空数组!'))
                     }
@@ -67,12 +58,42 @@ export default createStore({
         },
 
         // 根据权限列表过滤对应路由
-        FilterRoutes({ commit }, permissions) {
-            return new Promise(resolve => {
-                console.log(permissions);
+        FilterRoutes({ commit }, res) {
+            const { permissions } = res;
+            return new Promise((resolve, reject) => {
                 const routerList = filterAsyncRouter(asyncRouterMap, permissions)
-                commit('setRouterList', routerList)
-                resolve()
+                routerList.push({
+                    path: '/:pathMatch(.*)',
+                    redirect: '/exception',
+                    hidden: true
+                })
+                if (routerList.length) {
+                    commit('setRouterList', routerList)
+                    resolve()
+                } else {
+                    reject(new Error('无法获取该用户角色，请重新登录!'))
+                }
+            })
+        },
+
+        // 登出
+        Logout({ commit }) {
+            return new Promise((resolve,reject) => {
+                logoutApi().then(response => {
+                    if (response.code != 200) {
+                        reject(response);
+                        return
+                    }
+                    commit('setToken', '');
+                    commit('setInfo', {});
+                    commit('setPermission', []);
+                    commit('setRouterList', []);
+                    storage.remove(ACCESS_TOKEN);
+                    storage.remove('userInfo');
+                    resolve();
+                }).catch(error => {
+                    reject(error);
+                })
             })
         }
     },
@@ -80,35 +101,17 @@ export default createStore({
     }
 })
 
-
+// 根据权限列表过滤路由
 function filterAsyncRouter(routerMap, permissions) {
-    console.log(routerMap);
-    console.log(permissions);
-    // const routerList = [];
-
-    // routerMap.forEach(route => {
-    //     const { permission } = route.mata;
-    //     if (permissions.includes(permission)) {
-    //         routerList.push(route)
-    //         if (route.children && route.children.length) {
-    //             route.children = filterAsyncRouter(route.children, roles)
-    //         }
-    //     }
-    // });
-    // return routerList
-
     const routerList = routerMap.filter(route => {
-        console.log(route.meta);
         if (route.meta && route.meta.permission) {
-            const { permission } = route.mata;
-    
+            const { permission } = route.meta;
             if (permissions.includes(permission)) {
                 if (route.children && route.children.length) {
                     route.children = filterAsyncRouter(route.children, permissions);
                 }
                 return true
             }
-
         }
         return false
     })

@@ -27,7 +27,7 @@ router.beforeEach((to, from, next) => {
     // 设置系统标题
     if (to.meta && to.meta.title) {
         const domTitle = '综合OA';
-        document.title = to.meta.title + domTitle;
+        document.title = to.meta.title + '-' + domTitle;
     }
 
     /* has token */
@@ -37,42 +37,33 @@ router.beforeEach((to, from, next) => {
             NProgress.done()
         } else {
             // 判断是否有权限
-
-            if (store.state.permission.length === 0) {
+            if (!store.state.permission.length) {
                 // request login userInfo
                 store
                     .dispatch('GetInfo')
-                    .then(() => {
-                        const { routerList } = store.state;
-                        console.log(routerList);
-
-                        router.addRoute(routerList)
-                        // router.addRoutes(routerList)
-
-                        // 请求带有 redirect 重定向时，登录自动重定向到该地址
-                        const redirect = decodeURIComponent(from.query.redirect || to.path)
-
-                        if (to.path === redirect) {
-                            // set the replace: true so the navigation will not leave a history record
+                    .then((permissions) => {
+                        store.dispatch('FilterRoutes', { permissions }).then(() => {
+                            const { routerList } = store.state;
+                            // 动态添加可访问路由表
+                            routerList.forEach(item => {
+                                router.addRoute(item)
+                            })
+                            // 必要，要不然会死循环
                             next({ ...to, replace: true })
-                        } else {
-                            // 跳转到目的路由
-                            next({ path: redirect })
-                        }
+                        })
                     })
-                    .catch(err => {
-                        console.log(err);
+                    .catch(() => {
                         Notification.error({
                             title: '错误',
                             content: '请求用户信息失败，请重试'
                         })
 
                         // 失败时，获取用户信息失败时，调用登出，来清空历史保留信息
-                        // store.dispatch('Logout').then(() => {
-                        //     next({ path: loginRoutePath, query: { redirect: to.fullPath } })
-                        // }).catch(err => {
-                        //     window.location.href = '/'
-                        // })
+                        store.dispatch('Logout').then(() => {
+                            next({ path: loginRoutePath, query: { redirect: to.fullPath } })
+                        }).catch(() => {
+                            window.location.href = '/'
+                        })
                     })
             } else {
                 next()

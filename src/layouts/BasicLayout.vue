@@ -69,10 +69,14 @@
 </template>
 <script>
 import { defineComponent, ref } from "vue";
-import { Message } from "@arco-design/web-vue";
 
 export default defineComponent({
     components: {},
+    data() {
+        return {
+
+        }
+    },
     setup() {
         const collapsed = ref(false);
         const onCollapse = () => {
@@ -82,10 +86,19 @@ export default defineComponent({
             collapsed,
             onCollapse,
             onClickMenuItem(key) {
-                Message.info({ content: `You select ${key}`, showIcon: true });
+                this.$message.info({ content: `You select ${key}`, showIcon: true });
             },
         };
     },
+
+    created() {
+        
+    },
+    methods: {
+
+    }
+
+
 });
 </script>
 <style lang="less" scoped>
