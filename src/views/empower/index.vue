@@ -6,7 +6,7 @@
             </div>
 
             <div class="login-form">
-                <a-form ref="formRef" :model="formData" :rules="formRules" @submit="handleSubmit">
+                <a-form ref="formRef" :model="formData" @submit="handleSubmit">
                     <a-form-item field="userName" label="用户名"
                         :rules="[{required:true,message:'name is required'},{minLength:5, message:'must be greater than 5 characters'}]"
                         :validate-trigger="['change','input']"

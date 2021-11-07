@@ -7,15 +7,14 @@
 import storage from 'store'
 import router from '@/router'
 import store from '@/store'
-import NProgress from 'nprogress' // progress bar
-
-// import '@/components/NProgress/nprogress.less' // progress bar custom style
-
-import Notification from '@arco-design/web-vue/es/notification'
-
 import { ACCESS_TOKEN } from '@/store/mutation-types'
 
+import Notification from '@arco-design/web-vue/es/notification'
+import NProgress from 'nprogress' // progress bar
+import 'nprogress/nprogress.css'
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
+
+
 
 const whiteList = ['empower'] // no redirect whitelist
 const loginRoutePath = '/empower'

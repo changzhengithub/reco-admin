@@ -81,3 +81,7 @@ a:hover {
     transform: translateY(-10px);
     opacity: 0;
 }
+
+#nprogress .bar {
+    background: #165DFF !important;
+}

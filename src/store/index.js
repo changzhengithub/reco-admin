@@ -63,7 +63,7 @@ export default createStore({
             return new Promise((resolve, reject) => {
                 const routerList = filterAsyncRouter(asyncRouterMap, permissions)
                 routerList.push({
-                    path: '/:pathMatch(.*)',
+                    path: '/:catchAll(.*)',
                     redirect: '/exception',
                     hidden: true
                 })

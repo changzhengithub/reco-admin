@@ -1,3 +1,4 @@
+import { shallowRef } from 'vue'
 // eslint-disable-next-line
 import { UserLayout, BasicLayout } from '@/layouts'
 // eslint-disable-next-line
@@ -11,9 +12,9 @@ export const asyncRouterMap = [
     {
         path: '/',
         name: 'index',
-        component: BasicLayout,
+        component: shallowRef(BasicLayout),
         meta: { permission: 'index'},
-        redirect: '/home',
+        redirect: '/about',
         hidden: false,
         children: [
             // 首页
@@ -23,6 +24,16 @@ export const asyncRouterMap = [
                 component: () => import('@/views/home'),
                 meta: { title: '首页', icon: 'home', keepAlive: true, permission: 'home' },
                 hidden: false,
+                children: [
+                    // 关于
+                    {
+                        path: '/about',
+                        component: () => import('@/views/about'),
+                        name: 'about',
+                        meta: { title: '关于', icon: 'cloud-server', keepAlive: true, permission: 'about' },
+                        hidden: false,
+                    },
+                ]
             },
 
             // 用户信息
@@ -44,16 +55,6 @@ export const asyncRouterMap = [
             },
         ]
     },
-    // 关于
-    {
-        path: '/about',
-        component: () => import('@/views/about'),
-        name: 'about',
-        meta: { title: '关于', icon: 'cloud-server', keepAlive: true, permission: 'about' },
-        hidden: false,
-    },
-
-    
 ]
 
 // 基础路由

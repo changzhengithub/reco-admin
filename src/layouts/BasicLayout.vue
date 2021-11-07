@@ -6,43 +6,27 @@
                 <div class="logo-title">综合管理系统</div>
             </div>
             <a-menu
-                :defaultOpenKeys="['1']"
-                :defaultSelectedKeys="['0_3']"
                 :style="{ width: '100%' }"
+                :auto-open="true"
+                :selected-keys="selectedKeys"
                 @menuItemClick="onClickMenuItem"
             >
-                <a-menu-item key="0_2">
-                    <icon-menu-unfold />
-                    Menu 2
-                </a-menu-item>
-                <a-menu-item key="0_3">
-                    <icon-menu-unfold />
-                    Menu 3
-                </a-menu-item>
-                <a-sub-menu key="1">
-                    <template #title>
-                        <span><icon-menu-unfold />Navigation 1</span>
-                    </template>
-                    <a-menu-item key="1_1">Menu 1</a-menu-item>
-                    <a-menu-item key="1_2">Menu 2</a-menu-item>
-                    <a-sub-menu key="2" title="Navigation 2">
-                        <a-menu-item key="2_1">Menu 1</a-menu-item>
-                        <a-menu-item key="2_2">Menu 2</a-menu-item>
+                <template v-for="(item, index) in menuList" :key="index">
+                    <a-menu-item :key="item.path" v-if="!item.children">
+                        <icon-menu-unfold />
+                        {{item.meta.title}}
+                    </a-menu-item>
+                    <a-sub-menu v-if="item.children">
+                        <template #title>
+                            <span><icon-menu-unfold />{{item.meta.title}}</span>
+                        </template>
+                        <a-menu-item v-for="(subItem) in item.children" :key="subItem.path">
+                            {{subItem.meta.title}}
+                        </a-menu-item>
                     </a-sub-menu>
-                    <a-sub-menu key="3" title="Navigation 3">
-                        <a-menu-item key="3_1">Menu 1</a-menu-item>
-                        <a-menu-item key="3_2">Menu 2</a-menu-item>
-                        <a-menu-item key="3_3">Menu 3</a-menu-item>
-                    </a-sub-menu>
-                </a-sub-menu>
-                <a-sub-menu key="4">
-                    <template #title>
-                        <span><icon-menu-unfold />Navigation 4</span>
-                    </template>
-                    <a-menu-item key="4_1">Menu 1</a-menu-item>
-                    <a-menu-item key="4_2">Menu 2</a-menu-item>
-                    <a-menu-item key="4_3">Menu 3</a-menu-item>
-                </a-sub-menu>
+                    
+                </template>
+        
             </a-menu>
         </a-layout-sider>
         <a-layout>
@@ -51,13 +35,13 @@
                     <icon-menu-unfold v-if="collapsed" />
                     <icon-menu-fold v-else />
                 </a-button>
-            </a-layout-header>
-            <a-layout class="basic-layout">
                 <a-breadcrumb :style="{ margin: '16px 0' }">
                     <a-breadcrumb-item>Home</a-breadcrumb-item>
                     <a-breadcrumb-item>List</a-breadcrumb-item>
                     <a-breadcrumb-item>App</a-breadcrumb-item>
                 </a-breadcrumb>
+            </a-layout-header>
+            <a-layout class="basic-layout">
                 <a-layout-content>
                     <router-view />
                 </a-layout-content>
@@ -67,40 +51,72 @@
         </a-layout>
     </a-layout>
 </template>
+
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue"
+import { mapState } from 'vuex'
+
 
 export default defineComponent({
     components: {},
     data() {
         return {
+            collapsed: false, // 折叠导航栏
+            menuList: [],
+            currentRoute: '',
+            selectedKeys: [],
+            openKeys: [],
 
         }
     },
-    setup() {
-        const collapsed = ref(false);
-        const onCollapse = () => {
-            collapsed.value = !collapsed.value;
-        };
-        return {
-            collapsed,
-            onCollapse,
-            onClickMenuItem(key) {
-                this.$message.info({ content: `You select ${key}`, showIcon: true });
-            },
-        };
+    computed: {
+        ...mapState(['routerList'])
     },
 
     created() {
-        
+        console.log(this.$route);
+        const menuList = this.getMeunList(this.routerList)
+        this.menuList = menuList[0].children
+        this.selectedKeys = [this.$route.path]
+        // this.openKeys = [this.$route.path]
     },
     methods: {
+        // 获取路由列表
+        getMeunList(routerList) {
+            const menuList = routerList.filter(item => {
+                if (!item.hidden) {
+                    if (item.children && item.children.length) {
+                        console.log(item.children);
+                        item.children = this.getMeunList(item.children);
+                    }
+                    return true
+                }
+                return false
+            });
+            return menuList
+        },
+
+        // 折叠展开导航栏
+        onCollapse() {
+            this.collapsed = !this.collapsed
+        },
+
+        // 路由跳转
+        onClickMenuItem(key) {
+            console.log(key);
+            this.selectedKeys = [key]
+            this.$message.info({ content: `You select ${key}`, showIcon: true });
+            this.$router.push({
+                path: key
+            })
+        },
 
     }
 
 
 });
 </script>
+
 <style lang="less" scoped>
     .basic {
         width: 100%;
@@ -139,7 +155,7 @@ export default defineComponent({
         }
 
         .basic-layout {
-            padding: 0 24px 24px 24px;
+            padding: 20px;
             // min-height: calc(100vh- 64px);
             background-color: #f2f2f2;
 

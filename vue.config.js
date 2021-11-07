@@ -1,3 +1,4 @@
+const path = require("path");
 // vue.config.js
 module.exports = {
     // 选项...
@@ -31,8 +32,14 @@ module.exports = {
                     // 'primary-color': '#F5222D',
                 },
                 // DO NOT REMOVE THIS LINE
-                javascriptEnabled: true
+                javascriptEnabled: true,
             }
         }
     },
+    pluginOptions: {
+        'style-resources-loader': {
+            preProcessor: 'less',
+            patterns: [path.resolve(__dirname, './src/assets/less/flex.less')]
+        }
+    }
 }
