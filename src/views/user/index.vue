@@ -2,6 +2,7 @@
     <div class="about">
         <h1>用户信息</h1>
         <div class="box">
+            <input type="text" v-focus>
             <div>11111</div>
             <div>222222222</div>
         </div>
