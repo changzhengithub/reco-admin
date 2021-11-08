@@ -146,6 +146,7 @@ export default defineComponent({
         position: relative;
         width: 100vw;
         height: 100vh;
+        min-height: 100vh;
         background-color: #f2f2f2;
 
         .empower-login {
@@ -153,11 +154,13 @@ export default defineComponent({
             left: 50%;
             top: 50%;
             z-index: 9;
-            width: 500px;
+            width: 1000px;
+            height: 500px;
             padding: 20px;
             text-align: center;
             background-color: #fff;
-            transform: translate(-50%, -100%);
+            border-radius: 15px;
+            transform: translate(-50%, -50%);
 
             .login-title {
                 font-size: 24px;

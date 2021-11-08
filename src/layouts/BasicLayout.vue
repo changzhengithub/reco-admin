@@ -1,5 +1,6 @@
 <template>
     <a-layout class="basic">
+        <!-- 侧边导航栏 start -->
         <a-layout-sider hide-trigger collapsible :collapsed="collapsed">
             <div class="logo">
                 <img src="@/assets/images/logo.png" alt="">
@@ -14,7 +15,7 @@
                         <arcoIcon :icon="item.meta.icon"></arcoIcon>
                         {{item.meta.title}}
                     </a-menu-item>
-                    <a-sub-menu v-if="item.children">
+                    <a-sub-menu v-if="item.children" :key="item.path">
                         <template #title>
                             <span><arcoIcon :icon="item.meta.icon"></arcoIcon>{{item.meta.title}}</span>
                         </template>
@@ -28,18 +29,14 @@
         
             </a-menu>
         </a-layout-sider>
+        <!-- 侧边导航栏 end -->
         <a-layout>
-            <a-layout-header style="padding-left: 20px">
-                <a-button shape="round" @click="onCollapse">
-                    <icon-menu-unfold v-if="collapsed" />
-                    <icon-menu-fold v-else />
-                </a-button>
-                <a-breadcrumb :style="{ margin: '16px 0' }">
-                    <a-breadcrumb-item>Home</a-breadcrumb-item>
-                    <a-breadcrumb-item>List</a-breadcrumb-item>
-                    <a-breadcrumb-item>App</a-breadcrumb-item>
-                </a-breadcrumb>
+            <!-- 头部 start -->
+            <a-layout-header>
+                <GlobalHeader @COLLAPSE_EVENT="onCollapse"></GlobalHeader>
             </a-layout-header>
+            <!-- 头部 end -->
+
             <a-layout class="basic-layout">
                 <a-layout-content>
                     <router-view />
@@ -56,11 +53,13 @@ import { defineComponent } from "vue"
 import { mapState } from 'vuex'
 
 import { arcoIcon } from '@/utils/render'
+import GlobalHeader from '@/components/GlobalHeader'
 
 
 export default defineComponent({
     components: {
-        arcoIcon
+        arcoIcon,
+        GlobalHeader
     },
   
     data() {
@@ -77,11 +76,9 @@ export default defineComponent({
     },
 
     created() {
-        console.log(this.$route);
         const menuList = this.getMeunList(this.routerList)
         this.menuList = menuList[0].children
         this.selectedKeys = [this.$route.path]
-        // this.openKeys = [this.$route.path]
     },
     methods: {
         // 获取路由列表
@@ -106,9 +103,7 @@ export default defineComponent({
 
         // 路由跳转
         onClickMenuItem(key) {
-            console.log(key);
             this.selectedKeys = [key]
-            this.$message.info({ content: `You select ${key}`, showIcon: true });
             this.$router.push({
                 path: key
             })

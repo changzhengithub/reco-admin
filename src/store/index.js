@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import storage from 'store'
+// eslint-disable-next-line
 import { infoApi, logoutApi } from '@/api/login'
 import { asyncRouterMap } from '@/router/router.config'
 import { ACCESS_TOKEN } from './mutation-types'
@@ -78,22 +79,30 @@ export default createStore({
 
         // 登出
         Logout({ commit }) {
+            // eslint-disable-next-line
             return new Promise((resolve,reject) => {
-                logoutApi().then(response => {
-                    if (response.code != 200) {
-                        reject(response);
-                        return
-                    }
-                    commit('setToken', '');
-                    commit('setInfo', {});
-                    commit('setPermission', []);
-                    commit('setRouterList', []);
-                    storage.remove(ACCESS_TOKEN);
-                    storage.remove('userInfo');
-                    resolve();
-                }).catch(error => {
-                    reject(error);
-                })
+                commit('setToken', '');
+                commit('setInfo', {});
+                commit('setPermission', []);
+                commit('setRouterList', []);
+                storage.remove(ACCESS_TOKEN);
+                storage.remove('userInfo');
+                resolve();
+                // logoutApi().then(response => {
+                //     if (response.code != 200) {
+                //         reject(response);
+                //         return
+                //     }
+                //     commit('setToken', '');
+                //     commit('setInfo', {});
+                //     commit('setPermission', []);
+                //     commit('setRouterList', []);
+                //     storage.remove(ACCESS_TOKEN);
+                //     storage.remove('userInfo');
+                //     resolve();
+                // }).catch(error => {
+                //     reject(error);
+                // })
             })
         }
     },
