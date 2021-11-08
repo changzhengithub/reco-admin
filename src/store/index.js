@@ -43,7 +43,7 @@ export default createStore({
                     commit('setInfo', response.data);
                     // 获取权限列表
                     // const { permissions } = response.data;
-                    const permissions = ['index', 'home', 'about', 'user'];
+                    const permissions = ['index', 'home', 'about', 'user', 'unitOrg', 'teamManage'];
                     
                     commit('setPermission', permissions); // permission.js 判断如果没有权限列表就重新请求
                     if (permissions.length) {

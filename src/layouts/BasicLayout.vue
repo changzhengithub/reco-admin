@@ -6,21 +6,20 @@
                 <div class="logo-title">综合管理系统</div>
             </div>
             <a-menu
-                :style="{ width: '100%' }"
-                :auto-open="true"
                 :selected-keys="selectedKeys"
                 @menuItemClick="onClickMenuItem"
             >
                 <template v-for="(item, index) in menuList" :key="index">
                     <a-menu-item :key="item.path" v-if="!item.children">
-                        <icon-menu-unfold />
+                        <arcoIcon :icon="item.meta.icon"></arcoIcon>
                         {{item.meta.title}}
                     </a-menu-item>
                     <a-sub-menu v-if="item.children">
                         <template #title>
-                            <span><icon-menu-unfold />{{item.meta.title}}</span>
+                            <span><arcoIcon :icon="item.meta.icon"></arcoIcon>{{item.meta.title}}</span>
                         </template>
                         <a-menu-item v-for="(subItem) in item.children" :key="subItem.path">
+                            <arcoIcon :icon="subItem.meta.icon"></arcoIcon>
                             {{subItem.meta.title}}
                         </a-menu-item>
                     </a-sub-menu>
@@ -56,9 +55,14 @@
 import { defineComponent } from "vue"
 import { mapState } from 'vuex'
 
+import { arcoIcon } from '@/utils/render'
+
 
 export default defineComponent({
-    components: {},
+    components: {
+        arcoIcon
+    },
+  
     data() {
         return {
             collapsed: false, // 折叠导航栏
@@ -66,7 +70,6 @@ export default defineComponent({
             currentRoute: '',
             selectedKeys: [],
             openKeys: [],
-
         }
     },
     computed: {

@@ -1,11 +1,7 @@
 import { shallowRef } from 'vue'
 // eslint-disable-next-line
-import { UserLayout, BasicLayout } from '@/layouts'
-// eslint-disable-next-line
-const RouteView = {
-    name: 'RouteView',
-    render: h => h('router-view')
-}
+import { RouteView, BasicLayout } from '@/layouts'
+
 
 // 权限路由
 export const asyncRouterMap = [
@@ -22,7 +18,7 @@ export const asyncRouterMap = [
                 path: '/home',
                 name: 'home',
                 component: () => import('@/views/home'),
-                meta: { title: '首页', icon: 'home', keepAlive: true, permission: 'home' },
+                meta: { title: '首页', icon: () =>(<icon-share-alt />), keepAlive: true, permission: 'home' },
                 hidden: false,
                 children: [
                     // 关于
@@ -30,7 +26,7 @@ export const asyncRouterMap = [
                         path: '/about',
                         component: () => import('@/views/about'),
                         name: 'about',
-                        meta: { title: '关于', icon: 'cloud-server', keepAlive: true, permission: 'about' },
+                        meta: { title: '关于', icon: () =>(<icon-tags />), keepAlive: true, permission: 'about' },
                         hidden: false,
                     },
                 ]
@@ -41,7 +37,7 @@ export const asyncRouterMap = [
                 path: '/user',
                 name: 'user',
                 component: () => import('@/views/user'),
-                meta: { title: '用户信息', icon: 'user', keepAlive: true, permission: 'user' },
+                meta: { title: '用户信息', icon: () =>(<icon-user />), keepAlive: true, permission: 'user' },
                 hidden: false,
             },
 
@@ -50,8 +46,28 @@ export const asyncRouterMap = [
                 path: '/setting',
                 name: 'setting',
                 component: () => import('@/views/setting'),
-                meta: { title: '设置', icon: 'setting', keepAlive: true, permission: 'setting' },
+                meta: { title: '设置', icon: ()=>(<icon-settings />), keepAlive: true, permission: 'setting' },
                 hidden: false,
+            },
+
+            // 组织单位
+            {
+                path: '/unitOrg',
+                name: 'unitOrg',
+                component: shallowRef(RouteView),
+                meta: { title: '组织单位', icon: () =>(<icon-apps />), keepAlive: true, permission: 'unitOrg' },
+                redirect: '/unitOrg/teamManage',
+                hidden: false,
+                children: [
+                    // 团队管理
+                    {
+                        path: '/unitOrg/teamManage',
+                        name: 'teamManage',
+                        component: () => import('@/views/teamManagement/index.vue'),
+                        meta: { title: '团队管理', icon: ()=>(<icon-interaction />), keepAlive: true, permission: 'teamManage' },
+                        hidden: false,
+                    },
+                ]
             },
         ]
     },
